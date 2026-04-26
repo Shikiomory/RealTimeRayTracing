@@ -1,34 +1,47 @@
-﻿#include <iostream>
-#include <SFML/Graphics.hpp>
+﻿#include <SFML/Graphics.hpp>
 
 #include "Renderer.h"
-using namespace sf;
+
+#include "objects/Hittable.h"
+#include "objects/HittableList.h"
+#include "objects/Sphere.h"
+
 using namespace std;
 
 
 const int WIDTH = 800;
-const int HEIGHT = 600;
-
+//const int HEIGHT = 600;
+const float RATIO = 16.0f / 9.0f;
 int main()
 {
-    RenderWindow window(VideoMode(WIDTH, HEIGHT), L"Новый проект", Style::Default);
+    int height = static_cast<int>(WIDTH / RATIO);
+    height = (height < 1) ? 1 : height;
+    
+    sf::RenderWindow window(sf::VideoMode(WIDTH, height), L"Новый проект", sf::Style::Default);
 
-    Texture texture;
-    texture.create(WIDTH, HEIGHT);
-    Sprite sprite(texture);
+    sf::Texture texture;
+    texture.create(WIDTH, height);
+    sf::Sprite sprite(texture);
 
-    vector<Uint8> buffer(WIDTH * HEIGHT * 4);
+    vector<sf::Uint8> buffer(WIDTH * height * 4);
 
     Renderer renderer;
+    Camera cam(WIDTH, RATIO);
+
+    HittableList world;
+    world.add(make_shared<Sphere>(Point3(0.0f, 0.0f, -2.0f), 1.0f));
+    world.add(make_shared<Sphere>(Point3(0.0f, -105.0f, -1.0f), 100.0f));
+    world.add(make_shared<Sphere>(Point3(2.0f, 0.0f, -3.0f), 1.0f));
+
     while (window.isOpen()) {
-        Event event;
+        sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == Event::Closed)
+            if (event.type == sf::Event::Closed)
                 window.close();
         }
         
-        renderer.Render(buffer, WIDTH, HEIGHT);
+        renderer.Render(buffer, cam, world);
 
         texture.update(buffer.data());
 

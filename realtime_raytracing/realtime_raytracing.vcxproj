@@ -139,8 +139,16 @@
     <ClCompile Include="src\engine\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Constants.h" />
+    <ClInclude Include="include\objects\HittableList.h" />
+    <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\Vector3.h" />
+    <ClInclude Include="include\Ray.h" />
+    <ClInclude Include="include\objects\Hittable.h" />
+    <ClInclude Include="include\objects\Sphere.h" />
+    <ClInclude Include="include\Utility.h" />
+    <ClInclude Include="include\Interval.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

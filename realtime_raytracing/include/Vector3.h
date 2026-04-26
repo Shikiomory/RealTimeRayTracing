@@ -38,6 +38,13 @@ struct Vector3 {
 	}
 
 	//операторы присвоения
+	Vector3& operator= (const Vector3& vec) {
+		x = vec.x;
+		y = vec.y;
+		z = vec.z;
+		return *this;
+	}
+
 	Vector3& operator+= (const Vector3& vec) {
 		x += vec.x;
 		y += vec.y;
@@ -106,6 +113,8 @@ struct Vector3 {
 };
 
 
+using Point3 = Vector3;
+using Color3 = Vector3;
 //внешние функции
 
 //умножение числа на вектор
