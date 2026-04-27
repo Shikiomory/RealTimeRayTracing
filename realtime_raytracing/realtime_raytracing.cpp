@@ -5,7 +5,7 @@
 #include "objects/Hittable.h"
 #include "objects/HittableList.h"
 #include "objects/Sphere.h"
-
+#include <string>
 using namespace std;
 
 
@@ -33,8 +33,11 @@ int main()
     world.add(make_shared<Sphere>(Point3(0.0f, -105.0f, -1.0f), 100.0f));
     world.add(make_shared<Sphere>(Point3(2.0f, 0.0f, -3.0f), 1.0f));
 
+    int frames = 0;
+    sf::Clock clock;
     while (window.isOpen()) {
         sf::Event event;
+
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
@@ -42,8 +45,17 @@ int main()
         }
         
         renderer.Render(buffer, cam, world);
-
         texture.update(buffer.data());
+
+        ++frames;
+        float time = clock.getElapsedTime().asSeconds();
+        if (time > 1.0f) {
+            int fps = frames / static_cast<int>(time);
+            window.setTitle("FPS: " + std::to_string(fps));
+
+            frames = 0;
+            clock.restart();
+        }
 
         window.clear();
         window.draw(sprite);

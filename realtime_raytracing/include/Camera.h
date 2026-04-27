@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include "Utility.h"
 
 class Camera
@@ -13,6 +13,16 @@ class Camera
 	Vector3 pixel_delta_v;
 	Point3 upper_left_point;
 	Point3 pixel00_loc;
+
+	int samples_per_pixel = 4;
+	float pixel_samples_scale = 1;
+
+
+	Vector3 sample_square() const {
+		return Vector3(fast_random(-0.5f, 0.5f), fast_random(-0.5f, 0.5f), 0);
+		//return Vector3(random(-0.5f, 0.5f), random(-0.5f, 0.5f), 0);
+	}
+
 public:
 
 	Camera() = default;
@@ -22,31 +32,38 @@ public:
 		height = static_cast<int>(_width / _ratio);
 		height = (height < 1) ? 1 : height;
 
-		//ширина вьюпорта
+		//С€РёСЂРёРЅР° РІСЊСЋРїРѕСЂС‚Р°
 		float viewport_width = viewport_height * (static_cast<float>(width) / height);
 
-		//векторы вдоль вьюпорта
+		//РІРµРєС‚РѕСЂС‹ РІРґРѕР»СЊ РІСЊСЋРїРѕСЂС‚Р°
 		Vector3 viewport_u = Vector3(viewport_width, 0, 0);
 		Vector3 viewport_v = Vector3(0, -viewport_height, 0);
 
-		//получение размеров пикселя.
+		//РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РїРёРєСЃРµР»СЏ.
 		pixel_delta_u = viewport_u / static_cast<float>(width);
 		pixel_delta_v = viewport_v / static_cast<float>(height);
 
-		//поллучение начального пикселя
+		//РїРѕР»Р»СѓС‡РµРЅРёРµ РЅР°С‡Р°Р»СЊРЅРѕРіРѕ РїРёРєСЃРµР»СЏ
 		upper_left_point = camera_center - Vector3(0, 0, focal_length) - viewport_u / 2.0f - viewport_v / 2.0f;
 		pixel00_loc = upper_left_point + 0.5f * (pixel_delta_u + pixel_delta_v);
+
+
+		pixel_samples_scale = 1.0f / samples_per_pixel;
 	}
 
-	//получение луча из пикселя
+	//РїРѕР»СѓС‡РµРЅРёРµ Р»СѓС‡Р° РёР· РїРёРєСЃРµР»СЏ
 	Ray get_ray(const int x, const int y) const{
-		Point3 pixel_center = pixel00_loc + (static_cast<float>(x) * pixel_delta_u) + (static_cast<float>(y) * pixel_delta_v);
-		Vector3 ray_direction = pixel_center - camera_center;
+		Vector3 offset = sample_square();
+		Point3 pixel_sample = pixel00_loc + ((static_cast<float>(x) + offset.x) * pixel_delta_u) + ((static_cast<float>(y) + offset.y) * pixel_delta_v);
+		//Point3 pixel_sample = pixel00_loc + (static_cast<float>(x) * pixel_delta_u) + (static_cast<float>(y) * pixel_delta_v);
+		Vector3 ray_direction = pixel_sample - camera_center;
 
-		return Ray(pixel_center, ray_direction);
+		return Ray(camera_center, ray_direction);
 	}
 
 	int get_width() const { return width; }
 	int get_height() const { return height; }
+	int get_samples() const { return samples_per_pixel; }
+	float get_samples_scale() const { return pixel_samples_scale; }
 };
 

@@ -22,6 +22,11 @@ struct Interval
 		return min < t && max > t;
 	}
 
+	float clamp(float x) const {
+		if (x > max) return max;
+		if (x < min) return min;
+		return x;
+	}
 
 	static const Interval empty, universe;
 };
