@@ -44,7 +44,7 @@ public:
 		rec.p = r.at(root);
 		Vector3 normal = (r.at(root) - center) / radius;
 		rec.set_face_normal(r, normal);
-		rec.mat = mat;
+		rec.mat = mat.get();
 
 		return true;
 	}

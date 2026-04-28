@@ -7,7 +7,7 @@ struct hit_record {
 	Vector3 normal;
 	float t;
 	bool front_face;
-	shared_ptr<Material> mat;
+	Material* mat;
 
 	//разворот нормали всегда против направления луча
 	void set_face_normal(const Ray& r, const Vector3& outward_normal) {

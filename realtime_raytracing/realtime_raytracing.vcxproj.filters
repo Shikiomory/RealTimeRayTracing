@@ -59,7 +59,10 @@
     <ClInclude Include="include\materials\PhongMaterial.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="include\Lights\PointLight.h">
+    <ClInclude Include="include\lights\PointLight.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="include\scene\Scene.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

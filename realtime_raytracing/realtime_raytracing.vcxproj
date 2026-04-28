@@ -153,7 +153,8 @@
     <ClInclude Include="include\Interval.h" />
     <ClInclude Include="include\materials\Material.h" />
     <ClInclude Include="include\materials\PhongMaterial.h" />
-    <ClInclude Include="include\Lights\PointLight.h" />
+    <ClInclude Include="include\lights\PointLight.h" />
+    <ClInclude Include="include\scene\Scene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
