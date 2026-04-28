@@ -1,11 +1,13 @@
 #pragma once
 #include "Utility.h"	
+#include  "materials\Material.h"
 
 struct hit_record {
 	Point3 p;
 	Vector3 normal;
 	float t;
 	bool front_face;
+	shared_ptr<Material> mat;
 
 	//разворот нормали всегда против направления луча
 	void set_face_normal(const Ray& r, const Vector3& outward_normal) {

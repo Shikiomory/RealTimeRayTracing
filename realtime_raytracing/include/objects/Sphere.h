@@ -5,11 +5,12 @@ class Sphere : public Hittable
 {
 	Point3 center = Point3(0.0f, 0.0f, 0.0f);
 	float radius = 0.0f;
+	shared_ptr<Material> mat;
 
 public:
 	//конструкторы
 	Sphere() = default;
-	Sphere(const Point3& _center, float _radius) : center(_center), radius(std::fmax(_radius, 0.0f)) {}
+	Sphere(const Point3& _center, float _radius, shared_ptr<Material> _mat) : center(_center), radius(std::fmax(_radius, 0.0f)), mat(_mat) {}
 
 	//проверка на попадание луча (наследование от класса Object потом)
 	bool hit(const Ray& r, Interval t_int, hit_record& rec) const override {
@@ -43,6 +44,7 @@ public:
 		rec.p = r.at(root);
 		Vector3 normal = (r.at(root) - center) / radius;
 		rec.set_face_normal(r, normal);
+		rec.mat = mat;
 
 		return true;
 	}

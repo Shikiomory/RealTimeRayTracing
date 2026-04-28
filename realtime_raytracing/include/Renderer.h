@@ -3,6 +3,7 @@
 #include <SFML/Config.hpp>
 #include "Camera.h"
 #include "objects/Hittable.h"
+#include <omp.h>
 
 class Renderer
 {
