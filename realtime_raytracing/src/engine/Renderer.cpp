@@ -6,7 +6,7 @@
 #include "materials/PhongMaterial.h"
 
 
-void Renderer::Render(std::vector<sf::Uint8>& buffer, const Camera& cam, const Scene& scene)
+void Renderer::Render(std::vector<sf::Uint8>& buffer, const MovCamera& cam, const Scene& scene)
 {
     int height = cam.get_height();
     int width = cam.get_width();

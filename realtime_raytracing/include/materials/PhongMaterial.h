@@ -20,7 +20,7 @@ public:
 		for (const auto& light : lights) {
 			Point3 light_pos = light.position;
 			Vector3 light_dir = (light_pos - rec.p).normalize();
-			Ray shadow_ray(rec.p, light_dir);
+			Ray shadow_ray(rec.p + rec.normal * 0.001f, light_dir);
 			float light_distance = (light_pos - rec.p).length();
 
 
