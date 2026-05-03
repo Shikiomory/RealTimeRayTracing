@@ -40,16 +40,24 @@ int main()
     Scene scene;
     HittableList world;
 
-    auto material_1 = std::make_shared<PhongMaterial>(Color3(1.0f, 0.0f, 0.0f), 0.1f, 1.0f, 0.5f, 32.0f);
-    auto material_2 = std::make_shared<PhongMaterial>(Color3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f, 0.1f, 2.0f);
-    auto material_3 = std::make_shared<PhongMaterial>(Color3(0.2f, 0.7f, 0.8f), 0.1f, 1.0f, 0.5f, 32.0f);
-    auto material_4 = std::make_shared<PhongMaterial>(Color3(0.7f, 0.3f, 0.8f), 0.1f, 1.0f, 0.5f, 32.0f);
+    auto material_1 = std::make_shared<PhongMaterial>(Color3(1.0f, 0.0f, 0.0f), 0.1f, 1.0f, 0.5f, 32);
+    auto material_2 = std::make_shared<PhongMaterial>(Color3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f, 0.1f, 2);
+    auto material_3 = std::make_shared<PhongMaterial>(Color3(0.2f, 0.7f, 0.8f), 0.1f, 1.0f, 0.5f, 32);
+    auto material_4 = std::make_shared<PhongMaterial>(Color3(0.7f, 0.3f, 0.8f), 0.1f, 1.0f, 0.5f, 32);
         
 
-    world.add(make_unique<Sphere>(Point3(0.0f, 0.0f, -2.0f), 1.0f, material_1));
-    world.add(make_unique<Sphere>(Point3(0.0f, -105.0f, -1.0f), 100.0f, material_2));
-    world.add(make_unique<Sphere>(Point3(2.0f, 0.0f, -3.0f), 1.0f, material_3));
+    world.add(Sphere(Point3(0.0f, 0.0f, -2.0f), 1.0f, material_1));
+    world.add(Sphere(Point3(0.0f, -105.0f, -1.0f), 100.0f, material_2));
+    world.add(Sphere(Point3(2.0f, 0.0f, -3.0f), 1.0f, material_3));
+    world.add(Plane(Point3(0.0f, -1.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f), material_2));
+    world.add(Cilinder(Point3(0.0f, -4.0f, -3.0f), Point3(0.0f, 1.0f, -3.0f), 1.0f, 1.0f, 1.0f, 1.0f, material_4));
 
+    //unique_ptr
+    //world.add(make_unique<Sphere>(Point3(0.0f, 0.0f, -2.0f), 1.0f, material_1));
+    //world.add(make_unique<Sphere>(Point3(0.0f, -105.0f, -1.0f), 100.0f, material_2));
+    //world.add(make_unique<Sphere>(Point3(2.0f, 0.0f, -3.0f), 1.0f, material_3));
+
+    //shared_ptr
     //world.add(make_shared<Sphere>(Point3(0.0f, 0.0f, -2.0f), 1.0f, material_1));
     //world.add(make_shared<Sphere>(Point3(0.0f, -105.0f, -1.0f), 100.0f, material_2));
     //world.add(make_shared<Sphere>(Point3(2.0f, 0.0f, -3.0f), 1.0f, material_3));

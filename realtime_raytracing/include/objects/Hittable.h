@@ -25,5 +25,7 @@ public:
 
 	virtual bool hit(const Ray& r, Interval t_int, hit_record& rec) const = 0;
 
+	virtual bool any_hit(const Ray& r, Interval t_int) const = 0;
+
 };
 

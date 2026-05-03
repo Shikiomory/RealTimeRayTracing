@@ -30,5 +30,19 @@ public:
 
 		return true;
 	}
+
+	bool any_hit(const Ray& r, Interval t_int) const override {
+		float denom = dot(normal, r.get_direction());
+		if (std::abs(denom) < 1e-6f) {
+			return false;
+		}
+
+		float root = dot(normal, pos - r.get_origin()) / denom;
+
+		if (!t_int.contains(root)) {
+			return false;
+		}
+		return true;
+	}
 };
 

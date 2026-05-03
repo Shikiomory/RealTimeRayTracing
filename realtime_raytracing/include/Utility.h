@@ -44,3 +44,12 @@ inline float fast_random(float min, float max) {
 	return min + (max - min) * fast_random();
 }
 
+inline float fast_pow(float a, int n) {
+	float res = 1.0f;
+	while (n > 0) {
+		if (n & 1) { res *= a; }
+		a *= a;
+		n >>= 1;
+	}
+	return res;
+}

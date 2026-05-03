@@ -5,7 +5,7 @@
 class PhongMaterial: public Material
 {
 	float ka, kd, ks;
-	float shininess;
+	int shininess;
 	Color3 color;
 public:
 
@@ -23,9 +23,16 @@ public:
 			Ray shadow_ray(rec.p + rec.normal * 0.001f, light_dir);
 			float light_distance = (light_pos - rec.p).length();
 
+			//если теневой луч никуда не попал //hit
+			//hit_record temp_rec;
+			//if (!world.hit(shadow_ray, Interval(0.001f, light_distance), temp_rec)) {
+			//	Vector3 camera_dir = -r.get_direction().normalize();
+			//	diff += getDiffusion(rec.normal, light_dir);
+			//	spec += getSpecular(rec.normal, light_dir, camera_dir);
+			//}
 
-			hit_record temp_rec;
-			if (!world.hit(shadow_ray, Interval(0.001f, light_distance), temp_rec)) {
+			//any_hit
+			if (!world.any_hit(shadow_ray, Interval(0.001f, light_distance))) {
 				Vector3 camera_dir = -r.get_direction().normalize();
 				diff += getDiffusion(rec.normal, light_dir);
 				spec += getSpecular(rec.normal, light_dir, camera_dir);
@@ -65,9 +72,9 @@ public:
 
 	float getSpecular(const Vector3& normal, const Vector3& light_dir, const Vector3& camera_dir) const {
 		Vector3 reflect_dir = 2.0f * dot(light_dir, normal) * normal - light_dir;
-		float ref_o_cam = dot(reflect_dir, camera_dir);
-		ref_o_cam = ref_o_cam > 0 ? ref_o_cam : 0;
-		float specular_light = std::max(0.0f, ks * std::pow(ref_o_cam, shininess));
+		float ref_o_cam = std::max(0.0f, dot(reflect_dir, camera_dir));
+		//float specular_light = std::max(0.0f, ks * std::pow(ref_o_cam, shininess));
+		float specular_light = std::max(0.0f, ks * fast_pow(ref_o_cam, shininess));
 		return specular_light;
 	}
 

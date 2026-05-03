@@ -7,6 +7,34 @@ class Sphere : public Hittable
 	float radius = 0.0f;
 	shared_ptr<Material> mat;
 
+	bool find_t(const Ray& r, Interval t_int, float& root) const {
+		Vector3 oc = center - r.get_origin(); //луч от центра к камере
+
+		//коэффициенты квадратного уравнения для вычисления пересечения луча и сферы
+		float a = r.get_direction().squareLength();
+		float h = dot(r.get_direction(), oc); // b / 2
+		float c = oc.squareLength() - radius * radius;
+
+		//вычисление дискриминанта / 4
+		float discriminant = h * h - a * c;
+
+		if (discriminant < 0) {
+			return false;
+		}
+
+		float sqrt_d = std::sqrt(discriminant);
+
+	    root = (h - sqrt_d) / a; //поиск t
+
+		if (!t_int.surrounds(root)) {
+			root = (h + sqrt_d) / a;
+			if (!t_int.surrounds(root)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 public:
 	//конструкторы
 	Sphere() = default;
@@ -47,6 +75,11 @@ public:
 		rec.mat = mat.get();
 
 		return true;
+	}
+
+	bool any_hit(const Ray& r, Interval t_int) const override {
+		float root;
+		return find_t(r, t_int, root);
 	}
 };
 
