@@ -45,17 +45,21 @@ int main()
     auto material_3 = std::make_shared<PhongMaterial>(Color3(0.2f, 0.7f, 0.8f), 0.1f, 1.0f, 0.5f, 32.0f);
     auto material_4 = std::make_shared<PhongMaterial>(Color3(0.7f, 0.3f, 0.8f), 0.1f, 1.0f, 0.5f, 32.0f);
         
-    world.add(make_shared<Sphere>(Point3(0.0f, 0.0f, -2.0f), 1.0f, material_1));
+
+    world.add(make_unique<Sphere>(Point3(0.0f, 0.0f, -2.0f), 1.0f, material_1));
+    world.add(make_unique<Sphere>(Point3(0.0f, -105.0f, -1.0f), 100.0f, material_2));
+    world.add(make_unique<Sphere>(Point3(2.0f, 0.0f, -3.0f), 1.0f, material_3));
+
+    //world.add(make_shared<Sphere>(Point3(0.0f, 0.0f, -2.0f), 1.0f, material_1));
     //world.add(make_shared<Sphere>(Point3(0.0f, -105.0f, -1.0f), 100.0f, material_2));
     //world.add(make_shared<Sphere>(Point3(2.0f, 0.0f, -3.0f), 1.0f, material_3));
-    world.add(make_shared<Sphere>(Point3(2.0f, 0.0f, -3.0f), 1.0f, material_3));
     //world.add(make_shared<Sphere>(Point3(2.0f, 0.0f, -3.0f), 1.0f, material_3));
 
-    world.add(make_shared<Plane>(Point3(0.0f, -1.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f), material_2));
+    //world.add(make_shared<Plane>(Point3(0.0f, -1.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f), material_2));
     //Cilinder(Point3 _pos1, Point3 _pos2, float _radius, float _a, float _b, float _c, shared_ptr<Material> _mat)
-    world.add(make_shared<Cilinder>(Point3(0.0f, -4.0f, -3.0f), Point3(0.0f, 1.0f, -3.0f), 1.0f, 1.0f, 1.0f, 1.0f, material_4));
+    //world.add(make_shared<Cilinder>(Point3(0.0f, -4.0f, -3.0f), Point3(0.0f, 1.0f, -3.0f), 1.0f, 1.0f, 1.0f, 1.0f, material_4));
 
-    scene.world = world;
+    scene.world = std::move(world);
     //scene.lights.push_back(PointLight(Point3(5.0f, 7.0f, 5.0f), Color3(1.0f, 1.0f, 1.0f), 1.0f));
     scene.lights.push_back(PointLight(Point3(-5.0f, 7.0f, 5.0f), Color3(1.0f, 1.0f, 1.0f), 1.0f));
 
