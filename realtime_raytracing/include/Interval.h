@@ -28,6 +28,10 @@ struct Interval
 		return x;
 	}
 
+	Interval expand(float delta) {
+		float padding = delta / 2.0f;
+		return Interval(min - padding, max + padding);
+	}
 	static const Interval empty, universe;
 };
 

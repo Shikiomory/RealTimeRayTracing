@@ -37,6 +37,18 @@ struct Vector3 {
 		return Vector3(0, 0, 0);
 	}
 
+	//обращение по иднексу
+	float operator[](int i) const {
+		if (i == 1) return y;
+		if (i == 2) return z;
+		return x;
+	}
+	float& operator[](int i) {
+		if (i == 1) return y;
+		if (i == 2) return z;
+		return x;
+	}
+
 	//операторы присвоения
 	Vector3& operator= (const Vector3& vec) {
 		x = vec.x;

@@ -142,6 +142,8 @@
     <ClCompile Include="src\engine\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\bvh\Aaab.h" />
+    <ClInclude Include="include\bvh\Bvh.h" />
     <ClInclude Include="include\Camera\CameraController.h" />
     <ClInclude Include="include\objects\Cilinder.h" />
     <ClInclude Include="include\Constants.h" />
