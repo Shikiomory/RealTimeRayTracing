@@ -5,7 +5,6 @@
 #include "objects/Sphere.h"
 #include "materials/PhongMaterial.h"
 
-
 void Renderer::Render(std::vector<sf::Uint8>& buffer, const MovCamera& cam, const Scene& scene)
 {
     int height = cam.get_height();
@@ -14,21 +13,66 @@ void Renderer::Render(std::vector<sf::Uint8>& buffer, const MovCamera& cam, cons
     float sample_scale = cam.get_samples_scale();
     float samples_per_pixel = cam.get_samples();
 
+    //кадры и знаменатель для накопительного буфера
+    if (cam.is_moved()) {
+        frames = 1;
+    }
+    else {
+        frames++;
+    }
+
+    float denom = 1.0f / static_cast<float>(frames);
+
+    //1 проход для заполнения буффера
 #pragma omp parallel for num_threads(16) schedule(dynamic, 16)
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
-            
-            Color3 pixel_color(0.0f, 0.0f, 0.0f);
-            for (int i = 0; i < samples_per_pixel; ++i) {
-                //создание луча из пикселя
-                Ray r = cam.get_ray(x, y);
-                //закраска пикселя
-                pixel_color += ray_color(r, scene);
+            Ray r = cam.get_ray(x, y, true);
+            int index = (x + width * y);
+            colorBuffer[index] = ray_color(r, scene);
+        }
+    }
+
+    //2 проход для сэмплинга и закрашивания
+#pragma omp parallel for num_threads(16) schedule(dynamic, 16)
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+
+            int index = (x + width * y);
+            int byte_index = index * 4;
+
+            bool sampling = false;
+            if (x > 0 && x < width - 1 && y > 0 && y < height - 1) {
+                int left = index - 1;
+                int right = index + 1;
+                int up = index - width;
+                int down = index + width;
+
+                if (is_different(colorBuffer, index, left) || is_different(colorBuffer, index, right) || is_different(colorBuffer, index, up) || is_different(colorBuffer, index, down)) {
+                    sampling = true;
+                }
             }
 
+
+            Color3 pixel_color = colorBuffer[index]; //цвет центра пикселя
+            //усредняем цвет, если на границе
+            if (sampling) {
+                for (int i = 0; i < samples_per_pixel - 1; ++i) {
+                    //создание луча из пикселя
+                    Ray r = cam.get_ray(x, y, true);
+                    //закраска пикселя
+                    pixel_color += ray_color(r, scene);
+                }
+                pixel_color *= sample_scale;
+                //pixel_color = Color3(1.0f,1.0f,0.0f);
+            }
+
+            //накопительный буфер (TAA)
+            pixel_color = temporalBuffer[index] * (1 - denom) + pixel_color * denom;
+            temporalBuffer[index] = pixel_color;
+
             //передаем цвета в sfml буффер
-            int index = (x + width * y) * 4;
-            set_pixel_color(buffer, index, sample_scale * pixel_color);
+            set_pixel_color(buffer, byte_index, pixel_color);   
         }
     }
 }
@@ -49,6 +93,17 @@ Color3 Renderer::ray_color(const Ray& r, const Scene& scene) {
     return (1.0f - a) * Color3(1.0f, 1.0f, 1.0f) + a * Color3(0.5f, 0.7f, 1.0f); //возвращаем градиент от синего к белому через lerp blendedValue=(1-a) * startValue + a * endValue
 }
 
+bool Renderer::is_different(const std::vector<Color3>& buffer, int idx_1, int idx_2)
+{
+    float dr = std::abs(buffer[idx_1].x - buffer[idx_2].x);
+    float dg = std::abs(buffer[idx_1].y - buffer[idx_2].y);
+    float db = std::abs(buffer[idx_1].z - buffer[idx_2].z);
+
+    float threshold = 0.05f;
+    return (0.2126 * dr + 0.7152 * dg + 0.0722 * db) > threshold;
+}
+
+
 void Renderer::set_pixel_color(std::vector<sf::Uint8>& buffer, int index, const Color3& pixel_color) {
     static const Interval intensity(0.0f, 0.999f);
     float r = pixel_color.x;
@@ -64,3 +119,5 @@ void Renderer::set_pixel_color(std::vector<sf::Uint8>& buffer, int index, const 
     buffer[index + 2] = static_cast<sf::Uint8>(256.0f * intensity.clamp(b)); //синий канал
     buffer[index + 3] = 255; //альфа канал
 }
+
+

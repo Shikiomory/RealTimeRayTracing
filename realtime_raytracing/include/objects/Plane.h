@@ -1,7 +1,7 @@
 #pragma once
 #include "Hittable.h"
 
-class Plane: public Hittable
+class Plane
 {
 	Point3 pos;
 	Vector3 normal;
@@ -11,7 +11,7 @@ public:
 	Plane() = default;
 	Plane(const Point3& _pos, const Vector3& _normal, shared_ptr<Material> _mat): pos(_pos), normal(_normal), mat(_mat) {}
 
-	bool hit(const Ray& r, Interval t_int, hit_record& rec) const override {
+	bool hit(const Ray& r, Interval t_int, hit_record& rec) const {
 		float denom = dot(normal, r.get_direction());
 		if (std::abs(denom) < 1e-6f) {
 			return false;
@@ -31,7 +31,7 @@ public:
 		return true;
 	}
 
-	bool any_hit(const Ray& r, Interval t_int) const override {
+	bool any_hit(const Ray& r, Interval t_int) const {
 		float denom = dot(normal, r.get_direction());
 		if (std::abs(denom) < 1e-6f) {
 			return false;

@@ -5,7 +5,7 @@ class CameraController
 {
 	MovCamera& cam;
 	float cam_speed = 1.0f;
-	float sensivity = 20.0f;
+	float sensivity = 0.5f;
 	float pitch = 0.0f;
 	float yaw = -90.0f;
 public:
@@ -19,7 +19,7 @@ public:
 	}
 
 	void rotate_cam(float offset_x, float offset_y, float dt) {
-		float velocity = sensivity * dt;
+		float velocity = sensivity;
 		pitch -= offset_y * velocity;
 		yaw += offset_x * velocity;
 		

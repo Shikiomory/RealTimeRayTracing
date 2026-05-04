@@ -1,7 +1,7 @@
 #pragma once
 #include "Hittable.h"
 
-class Sphere : public Hittable
+class Sphere
 {
 	Point3 center = Point3(0.0f, 0.0f, 0.0f);
 	float radius = 0.0f;
@@ -41,7 +41,7 @@ public:
 	Sphere(const Point3& _center, float _radius, shared_ptr<Material> _mat) : center(_center), radius(std::fmax(_radius, 0.0f)), mat(_mat) {}
 
 	//проверка на попадание луча (наследование от класса Object потом)
-	bool hit(const Ray& r, Interval t_int, hit_record& rec) const override {
+	bool hit(const Ray& r, Interval t_int, hit_record& rec) const {
 		Vector3 oc = center - r.get_origin(); //луч от центра к камере
 
 		//коэффициенты квадратного уравнения для вычисления пересечения луча и сферы
@@ -77,7 +77,7 @@ public:
 		return true;
 	}
 
-	bool any_hit(const Ray& r, Interval t_int) const override {
+	bool any_hit(const Ray& r, Interval t_int) const {
 		float root;
 		return find_t(r, t_int, root);
 	}

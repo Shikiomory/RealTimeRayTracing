@@ -1,7 +1,7 @@
 #pragma once
 #include "Hittable.h"
 
-class Cilinder: public Hittable
+class Cilinder
 {
 	Point3 pos1, pos2;
 	float a, b, c, radius, radius_sqr;
@@ -18,7 +18,7 @@ public:
 		y_min = std::min(pos1.y, pos2.y);
 	}
 
-	bool hit(const Ray& r, Interval t_int, hit_record& rec) const override {
+	bool hit(const Ray& r, Interval t_int, hit_record& rec) const {
 		Vector3 local_origin = r.get_origin() - pos1;
 		local_origin.y = 0.0f;
 		Vector3 local_dir = r.get_direction();
@@ -94,7 +94,7 @@ public:
 		return true;
 	}
 
-	bool any_hit(const Ray& r, Interval t_int) const override{
+	bool any_hit(const Ray& r, Interval t_int) const {
 		Vector3 local_origin = r.get_origin() - pos1;
 		local_origin.y = 0.0f;
 		Vector3 local_dir = r.get_direction();

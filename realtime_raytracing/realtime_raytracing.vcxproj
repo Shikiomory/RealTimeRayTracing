@@ -137,6 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="old\Renderer_old.cpp" />
     <ClCompile Include="realtime_raytracing.cpp" />
     <ClCompile Include="src\engine\Renderer.cpp" />
   </ItemGroup>

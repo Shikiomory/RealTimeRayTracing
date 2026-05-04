@@ -14,14 +14,15 @@ class MovCamera
 	Point3 upper_left_point;
 	Point3 pixel00_loc;
 
-	Point3 look_from;
-	Point3 look_at;
+	Point3 look_from, last_look_from;
+	Point3 look_at, last_look_at;
 	Vector3 vup;
 	Vector3 w, u, v;
 	float vfov;
 	int samples_per_pixel = 4;
 	float pixel_samples_scale = 1;
 
+	bool moved = false;
 
 	Vector3 sample_square() const {
 		return Vector3(fast_random(-0.5f, 0.5f), fast_random(-0.5f, 0.5f), 0);
@@ -46,6 +47,15 @@ public:
 			u = cross(vup, w).normalize();
 			v = cross(w, u);
 		
+			if (last_look_at != look_at || last_look_from != look_from) {
+				last_look_at = look_at;
+				last_look_from = look_from;
+				moved = true;
+			}
+			else {
+				moved = false;
+			}
+
 			float h = std::tan(pi / 360 * vfov);
 			viewport_height = 2 * h * focal_length;
 
@@ -74,8 +84,8 @@ public:
 	}
 
 	//получение луча из пикселя
-	Ray get_ray(const int x, const int y) const {
-		Vector3 offset = sample_square();
+	Ray get_ray(const int x, const int y, bool random) const {
+		Vector3 offset = random ? sample_square() : Vector3(1.0f, 1.0f, 1.0f);
 		Point3 pixel_sample = pixel00_loc + ((static_cast<float>(x) + offset.x) * pixel_delta_u) + ((static_cast<float>(y) + offset.y) * pixel_delta_v);
 		//Point3 pixel_sample = pixel00_loc + (static_cast<float>(x) * pixel_delta_u) + (static_cast<float>(y) * pixel_delta_v);
 		Vector3 ray_direction = pixel_sample - look_from;
@@ -83,13 +93,14 @@ public:
 		return Ray(look_from, ray_direction);
 	}
 
+	inline bool is_moved() const { return moved; }
 	inline int get_width() const { return width; }
 	inline int get_height() const { return height; }
 	inline int get_samples() const { return samples_per_pixel; }
 	inline float get_samples_scale() const { return pixel_samples_scale; }
-	inline Vector3 get_w() { return w; }
-	inline Vector3 get_u() { return u; }
-	inline Vector3 get_v() { return v; }
+	inline Vector3 get_w() const { return w; }
+	inline Vector3 get_u() const { return u; }
+	inline Vector3 get_v() const { return v; }
 
 };
 

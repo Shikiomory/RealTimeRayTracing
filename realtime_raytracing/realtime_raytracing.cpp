@@ -31,11 +31,12 @@ int main()
 
     vector<sf::Uint8> buffer(WIDTH * height * 4);
 
-    Renderer renderer;
+
     //Camera cam(WIDTH, RATIO);
     MovCamera cam(WIDTH, RATIO, Point3(0.0f, 0.0f, 0.0f), Point3(0.0f, 0.0f, -5.0f), Vector3(0.0f, 1.0f, 0.0f), 90);
     CameraController controller(cam);
     
+    Renderer renderer(cam);
 
     Scene scene;
     HittableList world;
