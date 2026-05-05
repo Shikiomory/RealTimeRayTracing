@@ -36,8 +36,8 @@ public:
 			const Interval& ax = axis_interval(axis);
 			const float adinv = 1.0f / ray_dir[axis];
 
-			float t_0 = (ax.min - ray_orig[axis]);
-			float t_1 = (ax.max - ray_orig[axis]);
+			float t_0 = (ax.min - ray_orig[axis]) * adinv;
+			float t_1 = (ax.max - ray_orig[axis]) * adinv;
 
 			if (t_0 < t_1) {
 				if (t_0 > t_int.min) t_int.min = t_0;
@@ -64,7 +64,7 @@ public:
 	static const Aaab empty, universe;
 };
 
-const Aaab Aaab::empty = Aaab(Interval::empty, Interval::empty, Interval::empty);
-const Aaab Aaab::universe = Aaab(Interval::universe, Interval::universe, Interval::universe);
+inline const Aaab Aaab::empty = Aaab(Interval::empty, Interval::empty, Interval::empty);
+inline const Aaab Aaab::universe = Aaab(Interval::universe, Interval::universe, Interval::universe);
 
 	
