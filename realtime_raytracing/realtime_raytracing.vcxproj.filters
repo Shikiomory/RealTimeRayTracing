@@ -24,6 +24,12 @@
     <ClCompile Include="old\Renderer_old.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="src\math\HittableList.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math\Bvh.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Renderer.h">
@@ -84,6 +90,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="include\bvh\Aaab.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="old\Bvh_old.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

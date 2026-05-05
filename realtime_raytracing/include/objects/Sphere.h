@@ -5,7 +5,9 @@ class Sphere
 {
 	Point3 center = Point3(0.0f, 0.0f, 0.0f);
 	float radius = 0.0f;
+	float radius_sqr = 0.0f;
 	shared_ptr<Material> mat;
+	Aaab bbox;
 
 	bool find_t(const Ray& r, Interval t_int, float& root) const {
 		Vector3 oc = center - r.get_origin(); //луч от центра к камере
@@ -38,7 +40,11 @@ class Sphere
 public:
 	//конструкторы
 	Sphere() = default;
-	Sphere(const Point3& _center, float _radius, shared_ptr<Material> _mat) : center(_center), radius(std::fmax(_radius, 0.0f)), mat(_mat) {}
+	Sphere(const Point3& _center, float _radius, shared_ptr<Material> _mat) : center(_center), radius(std::fmax(_radius, 0.0f)), mat(_mat) {
+		radius_sqr = radius * radius;
+		Vector3 rvec = Vector3(radius, radius, radius);
+		bbox = Aaab(center - rvec, center + rvec);
+	}
 
 	//проверка на попадание луча (наследование от класса Object потом)
 	bool hit(const Ray& r, Interval t_int, hit_record& rec) const {
@@ -47,7 +53,7 @@ public:
 		//коэффициенты квадратного уравнения для вычисления пересечения луча и сферы
 		float a = r.get_direction().squareLength();
 		float h = dot(r.get_direction(), oc); // b / 2
-		float c = oc.squareLength() - radius * radius;
+		float c = oc.squareLength() - radius_sqr;
 
 		//вычисление дискриминанта / 4
 		float discriminant = h * h - a * c;
@@ -81,5 +87,7 @@ public:
 		float root;
 		return find_t(r, t_int, root);
 	}
+
+	Aaab bounding_box() const { return bbox; }
 };
 

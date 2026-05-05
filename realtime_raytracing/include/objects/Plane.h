@@ -6,6 +6,7 @@ class Plane
 	Point3 pos;
 	Vector3 normal;
 	shared_ptr<Material> mat;
+	Aaab bbox;
 
 public:
 	Plane() = default;
@@ -44,5 +45,7 @@ public:
 		}
 		return true;
 	}
+
+	Aaab bounding_box() const { return bbox; }
 };
 

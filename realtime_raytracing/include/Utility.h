@@ -44,6 +44,10 @@ inline float fast_random(float min, float max) {
 	return min + (max - min) * fast_random();
 }
 
+inline int int_random(int min, int max) {
+	return static_cast<int>(fast_random(min, max + 1));
+}
+
 inline float fast_pow(float a, int n) {
 	float res = 1.0f;
 	while (n > 0) {

@@ -140,8 +140,11 @@
     <ClCompile Include="old\Renderer_old.cpp" />
     <ClCompile Include="realtime_raytracing.cpp" />
     <ClCompile Include="src\engine\Renderer.cpp" />
+    <ClCompile Include="src\math\Bvh.cpp" />
+    <ClCompile Include="src\math\HittableList.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="old\Bvh_old.h" />
     <ClInclude Include="include\bvh\Aaab.h" />
     <ClInclude Include="include\bvh\Bvh.h" />
     <ClInclude Include="include\Camera\CameraController.h" />

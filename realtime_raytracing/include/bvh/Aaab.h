@@ -14,6 +14,12 @@ public:
 		x = (a.x <= b.x) ? Interval(a.x, b.x) : Interval(b.x, a.x);
 		y = (a.y <= b.y) ? Interval(a.y, b.y) : Interval(b.y, a.y);
 		z = (a.z <= b.z) ? Interval(a.z, b.z) : Interval(b.z, a.z);
+	} 
+
+	Aaab(const Aaab& bbox_1, const Aaab& bbox_2) {
+		x = Interval(bbox_1.x, bbox_2.x);
+		y = Interval(bbox_1.y, bbox_2.y);
+		z = Interval(bbox_1.z, bbox_2.z);
 	}
 
 	const Interval& axis_interval(int n) const {
@@ -46,5 +52,19 @@ public:
 		}
 		return true;
 	}
+
+	int longest_axis() const {
+		if (x.size() > y.size()) {
+			return z.size() > x.size() ? 2 : 0;
+		}
+		else
+			return y.size() > z.size() ? 1 : 2;
+	}
+
+	static const Aaab empty, universe;
 };
 
+const Aaab Aaab::empty = Aaab(Interval::empty, Interval::empty, Interval::empty);
+const Aaab Aaab::universe = Aaab(Interval::universe, Interval::universe, Interval::universe);
+
+	

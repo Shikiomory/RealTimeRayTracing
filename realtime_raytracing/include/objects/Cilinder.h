@@ -8,6 +8,7 @@ class Cilinder
 	float y_max = infty;
 	float y_min = 0;
 	std::shared_ptr<Material> mat;
+	Aaab bbox;
 
 public:
 
@@ -152,5 +153,7 @@ public:
 
 		return false;
 	}
+
+	Aaab bounding_box() const { return bbox; }
 };
 

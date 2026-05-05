@@ -9,7 +9,10 @@ struct Interval
 	//конструкторы
 	Interval() : min(+infty), max(-infty) {}
 	Interval(float _min, float _max) : min(_min), max(_max) {}
-
+	Interval(const Interval& int_1, const Interval& int_2) {
+		min = int_1.min <= int_2.min ? int_1.min : int_2.min;
+		min = int_1.max >= int_2.max ? int_1.max : int_2.max;
+	}
 	float size() const {
 		return max - min;
 	}

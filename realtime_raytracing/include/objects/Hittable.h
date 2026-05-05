@@ -1,7 +1,7 @@
 #pragma once
 #include "Utility.h"	
 #include  "materials\Material.h"
-
+#include "bvh/Aaab.h"
 struct hit_record {
 	Point3 p;
 	Vector3 normal;
@@ -26,6 +26,8 @@ public:
 	virtual bool hit(const Ray& r, Interval t_int, hit_record& rec) const = 0;
 
 	virtual bool any_hit(const Ray& r, Interval t_int) const = 0;
+
+	virtual Aaab bounding_box() const = 0;
 
 };
 
