@@ -6,7 +6,8 @@ class Sphere
 	Point3 center = Point3(0.0f, 0.0f, 0.0f);
 	float radius = 0.0f;
 	float radius_sqr = 0.0f;
-	shared_ptr<Material> mat;
+	//shared_ptr<Material> mat;
+	uint32_t mat_id;
 	Aaab bbox;
 
 	bool find_t(const Ray& r, Interval t_int, float& root) const {
@@ -40,7 +41,7 @@ class Sphere
 public:
 	//конструкторы
 	Sphere() = default;
-	Sphere(const Point3& _center, float _radius, shared_ptr<Material> _mat) : center(_center), radius(std::fmax(_radius, 0.0f)), mat(_mat) {
+	Sphere(const Point3& _center, float _radius, uint32_t _mat_id) : center(_center), radius(std::fmax(_radius, 0.0f)), mat_id(_mat_id) {
 		radius_sqr = radius * radius;
 		Vector3 rvec = Vector3(radius, radius, radius);
 		bbox = Aaab(center - rvec, center + rvec);
@@ -76,9 +77,9 @@ public:
 		//запись данных о точке найденной
 		rec.t = root;
 		rec.p = r.at(root);
-		Vector3 normal = (r.at(root) - center) / radius;
+		Vector3 normal = (rec.p - center) / radius;
 		rec.set_face_normal(r, normal);
-		rec.mat = mat.get();
+		rec.mat_id = mat_id;
 
 		return true;
 	}

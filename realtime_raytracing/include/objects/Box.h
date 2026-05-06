@@ -2,7 +2,8 @@
 #include "Hittable.h"
 
 class Box : public Hittable {
-    shared_ptr<Material> mat;
+    //shared_ptr<Material> mat;
+    uint32_t mat_id;
     Aaab bbox;
 
     Vector3 get_normal(const Point3& p) const {
@@ -24,7 +25,7 @@ class Box : public Hittable {
         }
     }
 public:
-    Box(const Point3& a, const Point3& b, shared_ptr<Material> _mat): mat(_mat), bbox(a, b) {}
+    Box(const Point3& a, const Point3& b, uint32_t _mat_id): mat_id(_mat_id), bbox(a, b) {}
 
     bool hit(const Ray& r, Interval t_int, hit_record& rec) const override {
         const Point3& ray_orig = r.get_origin();
@@ -52,7 +53,8 @@ public:
         // После цикла t_int.min — это и есть наше ближайшее t
         rec.t = t_int.min;
         rec.p = r.at(rec.t);
-        rec.mat = mat.get();
+        //rec.mat = mat.get();
+        rec.mat_id = mat_id;
         rec.normal = get_normal(rec.p);
         rec.set_face_normal(r, rec.normal);
 

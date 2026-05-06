@@ -42,11 +42,17 @@ int main()
     Scene scene;
     HittableList world;
 
-    auto material_1 = std::make_shared<PhongMaterial>(Color3(1.0f, 0.0f, 0.0f), 0.1f, 1.0f, 0.5f, 32);
-    auto material_2 = std::make_shared<PhongMaterial>(Color3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f, 0.1f, 2);
-    auto material_3 = std::make_shared<PhongMaterial>(Color3(0.2f, 0.7f, 0.8f), 0.1f, 1.0f, 0.5f, 32);
-    auto material_4 = std::make_shared<PhongMaterial>(Color3(0.7f, 0.3f, 0.8f), 0.1f, 1.0f, 0.5f, 32);
-    auto material_5 = std::make_shared<PhongMaterial>(Color3(0.7f, 0.7f, 0.0f), 0.1f, 1.0f, 0.5f, 32);
+    //auto material_1 = std::make_shared<PhongMaterial>(Color3(1.0f, 0.0f, 0.0f), 0.1f, 0.9f, 0.1f, 5);
+    //auto material_2 = std::make_shared<PhongMaterial>(Color3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f, 0.1f, 2);
+    //auto material_3 = std::make_shared<PhongMaterial>(Color3(0.2f, 0.7f, 0.8f), 0.1f, 1.0f, 0.5f, 64);
+    //auto material_4 = std::make_shared<PhongMaterial>(Color3(0.7f, 0.3f, 0.8f), 0.1f, 1.0f, 0.5f, 32);
+    //auto material_5 = std::make_shared<PhongMaterial>(Color3(0.7f, 0.7f, 0.0f), 0.1f, 0.9f, 0.5f, 10);
+
+    auto material_1 = scene.add_material(PhongMaterial(Color3(1.0f, 0.0f, 0.0f), 0.1f, 0.9f, 0.1f, 5));
+    auto material_2 = scene.add_material(PhongMaterial(Color3(0.0f, 1.0f, 0.0f), 0.1f, 1.0f, 0.1f, 2));
+    auto material_3 = scene.add_material(PhongMaterial(Color3(0.2f, 0.7f, 0.8f), 0.1f, 1.0f, 0.5f, 64));
+    auto material_4 = scene.add_material(PhongMaterial(Color3(0.7f, 0.3f, 0.8f), 0.1f, 1.0f, 0.5f, 32));
+    auto material_5 = scene.add_material(PhongMaterial(Color3(0.7f, 0.7f, 0.0f), 0.1f, 0.9f, 0.5f, 10));
         
 
     scene.world.add(Sphere(Point3(0.0f, -105.0f, -1.0f), 100.0f, material_2));

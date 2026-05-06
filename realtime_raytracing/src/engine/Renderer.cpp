@@ -116,7 +116,8 @@ Color3 Renderer::ray_color(const Ray& r, const Scene& scene) {
     if (world.hit(r, Interval(0.001f, infty), rec)) {
         //Color3 color = 0.5f * Color3(rec.normal + Color3(1.0f, 1.0f, 1.0f));
 
-        Color3 totalLight = rec.mat->shade(r, rec, scene.lights, world);
+        const PhongMaterial& mat = scene.materials[rec.mat_id];
+        Color3 totalLight = mat.shade(r, rec, scene.lights, world);
         return totalLight;
     }
 

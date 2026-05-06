@@ -9,14 +9,15 @@ class Cilinder
 	float y_min = 0;
 	float height;
 	Vector3 u, v, w;
-	std::shared_ptr<Material> mat;
+	//std::shared_ptr<Material> mat;
+	uint32_t mat_id;
 	Aaab bbox;
 
 public:
 
 	Cilinder() = default;
 	//Cilinder(Point3 _pos1, float _radius, shared_ptr<Material> _mat) : pos1(_pos1), radius(_radius), mat(_mat), a(1.0f), b(1.0f), c(1.0f) {}
-	Cilinder(Point3 _pos1, Point3 _pos2, float _radius, shared_ptr<Material> _mat) : pos1(_pos1), pos2(_pos2), radius(_radius), mat(_mat), radius_sqr(_radius * _radius) {
+	Cilinder(Point3 _pos1, Point3 _pos2, float _radius, uint32_t _mat_id) : pos1(_pos1), pos2(_pos2), radius(_radius), mat_id(_mat_id), radius_sqr(_radius * _radius) {
 		y_max = std::max(pos1.y, pos2.y);
 		y_min = std::min(pos1.y, pos2.y);
 
@@ -129,7 +130,8 @@ public:
 
 		Vector3 normal = local_normal.x * u + local_normal.y * v + local_normal.z * w;
 		rec.set_face_normal(r, normal);
-		rec.mat = mat.get();
+		//rec.mat = mat.get();
+		rec.mat_id = mat_id;
 
 		return true;
 	}
