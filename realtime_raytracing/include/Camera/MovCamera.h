@@ -3,8 +3,12 @@
 
 class MovCamera
 {
-	int width;
-	int height;
+	int window_width;
+	int window_height;
+
+	float scale = 0.7f;
+	int render_width;
+	int render_height;
 
 	float viewport_height = 2.0f;
 	float focal_length = 1.0f;
@@ -33,10 +37,11 @@ public:
 
 	MovCamera() = default;
 	MovCamera(int _width, float _ratio, Point3 _look_from, Point3 _look_at, Vector3 _vup, float _vfov): look_from(_look_from), look_at(_look_at), vup(_vup), vfov(_vfov) {
-		width = _width;
-		height = static_cast<int>(_width / _ratio);
-		height = (height < 1) ? 1 : height;
+		window_width = _width;
+		window_height = std::max(1, static_cast<int>(_width / _ratio));
 
+		render_width = window_width * scale;
+		render_height= window_height * scale;
 		update();
 
 		pixel_samples_scale = 1.0f / samples_per_pixel;
@@ -59,15 +64,15 @@ public:
 			float h = std::tan(pi / 360 * vfov);
 			viewport_height = 2 * h * focal_length;
 
-			float viewport_width = viewport_height * (static_cast<float>(width) / height);
+			float viewport_width = viewport_height * (static_cast<float>(window_width) / window_height);
 			Vector3 viewport_u = viewport_width * u;
 			Vector3 viewport_v = -viewport_height * v;
 
 			upper_left_point = look_from - w * focal_length - viewport_u / 2.0f - viewport_v / 2.0f;
 
 			//получение размеров пикселя.
-			pixel_delta_u = viewport_u / static_cast<float>(width);
-			pixel_delta_v = viewport_v / static_cast<float>(height);
+			pixel_delta_u = viewport_u / static_cast<float>(render_width);
+			pixel_delta_v = viewport_v / static_cast<float>(render_height);
 
 			pixel00_loc = upper_left_point + 0.5f * (pixel_delta_u + pixel_delta_v);
 		}
@@ -94,8 +99,10 @@ public:
 	}
 
 	inline bool is_moved() const { return moved; }
-	inline int get_width() const { return width; }
-	inline int get_height() const { return height; }
+	inline int get_window_width() const { return window_width; }
+	inline int get_window_height() const { return window_height; }
+	inline int get_render_width() const { return render_width; }
+	inline int get_render_height() const { return render_height; }
 	inline int get_samples() const { return samples_per_pixel; }
 	inline float get_samples_scale() const { return pixel_samples_scale; }
 	inline Vector3 get_w() const { return w; }

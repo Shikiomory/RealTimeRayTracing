@@ -7,9 +7,11 @@
 
 void Renderer::Render(std::vector<sf::Uint8>& buffer, const MovCamera& cam, const Scene& scene)
 {
-    int height = cam.get_height();
-    int width = cam.get_width();
-
+    int window_height = cam.get_window_height();
+    int window_width = cam.get_window_width();
+    
+    int render_height = cam.get_render_height();
+    int render_width = cam.get_render_width();
     float sample_scale = cam.get_samples_scale();
     float samples_per_pixel = cam.get_samples();
 
@@ -25,28 +27,28 @@ void Renderer::Render(std::vector<sf::Uint8>& buffer, const MovCamera& cam, cons
 
     //1 проход для заполнения буффера
 #pragma omp parallel for num_threads(16) schedule(dynamic, 16)
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
+    for (int y = 0; y < render_height; ++y) {
+        for (int x = 0; x < render_width; ++x) {
             Ray r = cam.get_ray(x, y, true);
-            int index = (x + width * y);
+            int index = (x + render_width * y);
             colorBuffer[index] = ray_color(r, scene);
         }
     }
 
     //2 проход для сэмплинга и закрашивания
 #pragma omp parallel for num_threads(16) schedule(dynamic, 16)
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
+    for (int y = 0; y < render_height; ++y) {
+        for (int x = 0; x < render_width; ++x) {
 
-            int index = (x + width * y);
+            int index = (x + render_width * y);
             int byte_index = index * 4;
 
             bool sampling = false;
-            if (x > 0 && x < width - 1 && y > 0 && y < height - 1) {
+            if (x > 0 && x < render_width - 1 && y > 0 && y < render_height - 1) {
                 int left = index - 1;
                 int right = index + 1;
-                int up = index - width;
-                int down = index + width;
+                int up = index - render_width;
+                int down = index + render_width;
 
                 if (is_different(colorBuffer, index, left) || is_different(colorBuffer, index, right) || is_different(colorBuffer, index, up) || is_different(colorBuffer, index, down)) {
                     sampling = true;
@@ -72,7 +74,37 @@ void Renderer::Render(std::vector<sf::Uint8>& buffer, const MovCamera& cam, cons
             temporalBuffer[index] = pixel_color;
 
             //передаем цвета в sfml буффер
-            set_pixel_color(buffer, byte_index, pixel_color);   
+            //set_pixel_color(buffer, byte_index, pixel_color);   
+        }
+    }
+
+    //3 проход (upscaling)
+    #pragma omp parallel for num_threads(16) schedule(dynamic, 16)
+    for (int y = 0; y < window_height; ++y) {
+        for (int x = 0; x < window_width; ++x) {
+            //перевод экранных координат в дробные рендерные координаты
+            float rx = static_cast<float>(x) * (render_width - 1) / (window_width - 1);
+            float ry = static_cast<float>(y) * (render_height - 1) / (window_height - 1);
+
+            //координаты соседних пикселей
+            int x0 = static_cast<int>(rx);
+            int y0 = static_cast<int>(ry);
+            int x1 = std::min(x0+1, render_width - 1);
+            int y1 = std::min(y0+1, render_height - 1);
+
+            //получение цветов соседних пикселей
+            Color3 c00 = temporalBuffer[y0 * render_width + x0];
+            Color3 c01 = temporalBuffer[y0 * render_width + x1];
+            Color3 c10 = temporalBuffer[y1 * render_width + x0];
+            Color3 c11 = temporalBuffer[y1 * render_width + x1];
+
+            //веса интерполяции
+            float tx = rx - x0;
+            float ty = ry - y0;
+
+            Color3 interpolated_color = c00 * (1.0f - tx) * (1.0f - ty) + c01 * tx * (1.0f - ty) + c10 * (1.0f - tx) * ty + c11 * tx * ty;
+            int index = (x + window_width * y) * 4;
+            set_pixel_color(buffer, index, interpolated_color);
         }
     }
 }

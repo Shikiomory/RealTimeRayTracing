@@ -144,6 +144,7 @@
     <ClCompile Include="src\math\HittableList.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\objects\Box.h" />
     <ClInclude Include="old\Bvh_old.h" />
     <ClInclude Include="include\bvh\Aaab.h" />
     <ClInclude Include="include\bvh\Bvh.h" />

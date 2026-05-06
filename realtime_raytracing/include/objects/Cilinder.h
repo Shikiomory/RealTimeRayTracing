@@ -4,9 +4,11 @@
 class Cilinder
 {
 	Point3 pos1, pos2;
-	float a, b, c, radius, radius_sqr;
+	float radius, radius_sqr;
 	float y_max = infty;
 	float y_min = 0;
+	float height;
+	Vector3 u, v, w;
 	std::shared_ptr<Material> mat;
 	Aaab bbox;
 
@@ -14,71 +16,87 @@ public:
 
 	Cilinder() = default;
 	//Cilinder(Point3 _pos1, float _radius, shared_ptr<Material> _mat) : pos1(_pos1), radius(_radius), mat(_mat), a(1.0f), b(1.0f), c(1.0f) {}
-	Cilinder(Point3 _pos1, Point3 _pos2, float _radius, float _a, float _b, float _c, shared_ptr<Material> _mat) : pos1(_pos1), pos2(_pos2), radius(_radius), a(_a), b(_b), c(_c), mat(_mat), radius_sqr(_radius * _radius) {
+	Cilinder(Point3 _pos1, Point3 _pos2, float _radius, shared_ptr<Material> _mat) : pos1(_pos1), pos2(_pos2), radius(_radius), mat(_mat), radius_sqr(_radius * _radius) {
 		y_max = std::max(pos1.y, pos2.y);
 		y_min = std::min(pos1.y, pos2.y);
+
+		Vector3 axis = pos2 - pos1;
+		height = std::sqrt(axis.squareLength());
+		v = axis / height;
+
+		Vector3 temp_vec = (std::abs(v.y) > 0.9f) ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(0.0f, 1.0f, 0.0f);
+		u = cross(v, temp_vec).normalize();
+		w = cross(u, v).normalize();
+
+		Point3 min_p(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), std::min(pos1.z, pos2.z));
+		Point3 max_p(std::max(pos1.x, pos2.x), std::max(pos1.y, pos2.y), std::max(pos1.z, pos2.z));
+		Vector3 rvec = Vector3(radius, radius, radius);
+		bbox = Aaab(min_p - rvec, max_p + rvec);
 	}
 
 	bool hit(const Ray& r, Interval t_int, hit_record& rec) const {
-		Vector3 local_origin = r.get_origin() - pos1;
-		local_origin.y = 0.0f;
-		Vector3 local_dir = r.get_direction();
-		local_dir.y = 0.0f;
+		//смещение
+		Vector3 oc = r.get_origin() - pos1;
+		Vector3 dir = r.get_direction();
 
-		float ak = local_dir.squareLength();
-		float h = dot(local_dir, local_origin);
-		float ck = local_origin.squareLength() - radius_sqr;
+		//поворот
+		Point3 local_origin(dot(oc, u), dot(oc, v), dot(oc, w));
+		Vector3 local_dir(dot(dir, u), dot(dir, v), dot(dir, w));
+
+		float ak = local_dir.x * local_dir.x + local_dir.z * local_dir.z;
+		float h = local_dir.x * local_origin.x + local_dir.z * local_origin.z;
+		float ck = local_origin.x * local_origin.x + local_origin.z * local_origin.z - radius_sqr;
 
 		float discriminant = h * h - ak * ck;
 
 		float closet_root = infty;
-		Vector3 normal;
-		Point3 p;
 
+		int hitN = -1;
 		if (discriminant >= 0) {
 			float sqrt_d = std::sqrt(discriminant);
 			float root = (-h - sqrt_d) / ak; //поиск t
 			float y;
 			if (t_int.surrounds(root)) {
-				y = root * r.get_direction().y + r.get_origin().y;
-				if (y >= y_min && y <= y_max) {
+				y = local_origin.y + root * local_dir.y;
+				if (y >= 0 && y <= height) {
 					closet_root = root;
-					p = r.at(root);
-					normal = (p - Vector3(pos1.x, p.y, pos1.z)) / radius;
+					hitN = 0;
 				}
 			}
 
 			root = (-h + sqrt_d) / ak;
 			if (root < closet_root && t_int.surrounds(root)) {
-				y = root * r.get_direction().y + r.get_origin().y;
-				if (y >= y_min && y <= y_max) {
+				y = local_origin.y + root * local_dir.y;
+				if (y >= 0 && y <= height) {
 					closet_root = root;
-					p = r.at(root);
-					normal = (p - Vector3(pos1.x, p.y, pos1.z)) / radius;
+					hitN = 1;
 				}
 			}
 
 		}
 
-		float dir_y = r.get_direction().y;
-		
-		if (std::abs(dir_y) > 1e-6f) {
-			float orig_y = r.get_origin().y;
+		Point3 p;
 
-			float root = (y_max - orig_y) / dir_y;
+		
+		if (std::abs(local_dir.y) > 1e-6f) {
+
+			float root = (height - local_origin.y) / local_dir.y;
 			if (root < closet_root && t_int.surrounds(root)) {
-				p = r.at(root);
-				if ((p.x - pos1.x) * (p.x - pos1.x) + (p.z - pos1.z) * (p.z - pos1.z) <= radius_sqr) {
-					normal = Vector3(0.0f, 1.0f, 0.0f);
+				float x = local_origin.x + root * local_dir.x;
+				float z = local_origin.z + root * local_dir.z;
+				if ((x * x + z * z) <= radius_sqr) {
+					hitN = 2;
 					closet_root = root;
 				}
 			}
 
-			root = (y_min - orig_y) / dir_y;
+			root = (0.0f - local_origin.y) / local_dir.y;
 			if (root < closet_root && t_int.surrounds(root)) {
-				p = r.at(root);
-				if ((p.x - pos1.x) * (p.x - pos1.x) + (p.z - pos1.z) * (p.z - pos1.z) <= radius_sqr) {
-					normal = Vector3(0.0f, -1.0f, 0.0f);
+				//p = r.at(root);
+				float x = local_origin.x + root * local_dir.x;
+				float z = local_origin.z + root * local_dir.z;
+				if ((x * x + z * z) <= radius_sqr) {
+					hitN = 3;
 					closet_root = root;
 				}
 			}
@@ -89,6 +107,27 @@ public:
 
 		rec.t = closet_root;
 		rec.p = r.at(closet_root);
+		Vector3 local_normal;
+
+		Point3 loc_p = local_origin + local_dir * closet_root;
+		switch (hitN) {
+		case 0:
+			p = r.at(closet_root);
+			local_normal = Vector3(loc_p.x / radius, 0.0f, loc_p.z / radius);
+			break;
+		case 1:
+			p = r.at(closet_root);
+			local_normal = Vector3(loc_p.x / radius, 0.0f, loc_p.z / radius);
+			break;
+		case 2:
+			local_normal = Vector3(0.0f, 1.0f, 0.0f);
+			break;
+		case 3:
+			local_normal = Vector3(0.0f, -1.0f, 0.0f);
+			break;
+		}
+
+		Vector3 normal = local_normal.x * u + local_normal.y * v + local_normal.z * w;
 		rec.set_face_normal(r, normal);
 		rec.mat = mat.get();
 
@@ -96,58 +135,47 @@ public:
 	}
 
 	bool any_hit(const Ray& r, Interval t_int) const {
-		Vector3 local_origin = r.get_origin() - pos1;
-		local_origin.y = 0.0f;
-		Vector3 local_dir = r.get_direction();
-		local_dir.y = 0.0f;
+		Vector3 oc = r.get_origin() - pos1;
+		Vector3 dir = r.get_direction();
 
-		float ak = local_dir.squareLength();
-		float h = dot(local_dir, local_origin);
-		float ck = local_origin.squareLength() - radius_sqr;
+		Point3 local_origin(dot(oc, u), dot(oc, v), dot(oc, w));
+		Vector3 local_dir(dot(dir, u), dot(dir, v), dot(dir, w));
+
+		float ak = local_dir.x * local_dir.x + local_dir.z * local_dir.z;
+		float h = local_dir.x * local_origin.x + local_dir.z * local_origin.z;
+		float ck = local_origin.x * local_origin.x + local_origin.z * local_origin.z - radius_sqr;
 
 		float discriminant = h * h - ak * ck;
 
 		if (discriminant >= 0) {
 			float sqrt_d = std::sqrt(discriminant);
-			float root = (-h - sqrt_d) / ak; //поиск t
-			float y;
+
+			float root = (-h - sqrt_d) / ak;
 			if (t_int.surrounds(root)) {
-				y = root * r.get_direction().y + r.get_origin().y;
-				if (y >= y_min && y <= y_max) {
-					return true;
-				}
+				float y = local_origin.y + root * local_dir.y;
+				if (y >= 0 && y <= height) return true;
 			}
 
 			root = (-h + sqrt_d) / ak;
 			if (t_int.surrounds(root)) {
-				y = root * r.get_direction().y + r.get_origin().y;
-				if (y >= y_min && y <= y_max) {
-					return true;
-				}
+				float y = local_origin.y + root * local_dir.y;
+				if (y >= 0 && y <= height) return true;
 			}
-
 		}
 
-		float dir_y =	r.get_direction().y;
-
-		Point3 p;
-		if (std::abs(dir_y) > 1e-6f) {
-			float orig_y = r.get_origin().y;
-
-			float root = (y_max - orig_y) / dir_y;
+		if (std::abs(local_dir.y) > 1e-6f) {
+			float root = (height - local_origin.y) / local_dir.y;
 			if (t_int.surrounds(root)) {
-				p = r.at(root);
-				if ((p.x - pos1.x) * (p.x - pos1.x) + (p.z - pos1.z) * (p.z - pos1.z) <= radius_sqr) {
-					return true;
-				}
+				float x = local_origin.x + root * local_dir.x;
+				float z = local_origin.z + root * local_dir.z;
+				if ((x * x + z * z) <= radius_sqr) return true;
 			}
 
-			root = (y_min - orig_y) / dir_y;
+			root = (0.0f - local_origin.y) / local_dir.y;
 			if (t_int.surrounds(root)) {
-				p = r.at(root);
-				if ((p.x - pos1.x) * (p.x - pos1.x) + (p.z - pos1.z) * (p.z - pos1.z) <= radius_sqr) {
-					return true;
-				}
+				float x = local_origin.x + root * local_dir.x;
+				float z = local_origin.z + root * local_dir.z;
+				if ((x * x + z * z) <= radius_sqr) return true;
 			}
 		}
 

@@ -18,7 +18,7 @@ class Renderer
 	//bool need_sampling(const std::vector<sf::Uint8>& buffer, int index, int width, int height);
 public:
 	Renderer(const MovCamera& cam) {
-		int size = cam.get_height() * cam.get_width();
+		int size = cam.get_render_height() * cam.get_render_width();
 		colorBuffer.resize(size);
 		temporalBuffer.resize(size);
 	}

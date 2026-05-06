@@ -6,6 +6,7 @@
 #include "objects/Cilinder.h"
 #include "objects/Sphere.h"
 #include "objects/Plane.h"
+#include "objects/Box.h"
 
 //проверка на этапе компиляции на тип: указатель или простая переменная
 template<typename T> struct is_unique_ptr : std::false_type {};
@@ -14,7 +15,7 @@ template<typename T> inline constexpr bool is_unique_ptr_v = is_unique_ptr<T>::v
 
 class Bvh;
 
-using HittableObject = std::variant<Sphere, Plane, Cilinder, std::unique_ptr<Bvh>>;
+using HittableObject = std::variant<Sphere, Box, Plane, Cilinder, std::unique_ptr<Bvh>>;
 
 class HittableList: public Hittable
 {
